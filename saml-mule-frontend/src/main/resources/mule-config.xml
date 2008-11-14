@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0" 
+	xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+	xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0" 
+	xmlns:wss="http://www.mulesource.org/schema/mule/wssecurity/2.0"
+	xmlns:saml="http://www.mulesource.org/schema/mule/saml/2.0"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+	   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/wssecurity/2.0 http://www.mulesource.org/schema/mule/wssecurity/2.0/mule-wssecurity.xsd
+       http://www.mulesource.org/schema/mule/saml/2.0 http://www.mulesource.org/schema/mule/saml/2.0/mule-saml.xsd">
+	<spring:beans>
+		<!-- Import JMS Settings  -->
+		<spring:import resource="classpath:mule-jms-config.xml" />
+
+		<!-- Import global system properties  -->
+		<spring:bean
+			class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+
+		<spring:bean id="HelloWorld" class="com.atosorigin.esi.saml.HelloWorldWebservice" />
+
+		<spring:bean name="wss4jInConfiguration2"
+			class="org.springframework.beans.factory.config.MapFactoryBean">
+			<spring:property name="sourceMap">
+				<spring:map>
+					<spring:entry key="action" value="SAMLTokenUnsigned Timestamp" />
+				</spring:map>
+			</spring:property>
+		</spring:bean>
+		
+	</spring:beans>
+
+	<saml:security-manager>
+		<saml:saml-security-provider name="samlSecurityProvider">
+			<saml:key-properties key-store-file="saml.ks" key-store-type="JKS" key-store-password="password" sign-key-alias="samlmule" sign-key-password="password"/>
+		</saml:saml-security-provider>
+	</saml:security-manager>
+
+	<model name="Main">
+		<!--
+			************************************************************************
+			Web Service definitions
+			*************************************************************************
+		-->
+		<service name="HelloWorldWSService">
+			<inbound>
+				<cxf:inbound-endpoint address="http://localhost:8003/esi/saml-test"
+					serviceClass="com.atosorigin.esi.saml.Saml" mtomEnabled="true" >
+					<property key="schema-validation-enabled" value="true" />
+					<saml:cxf-security-filter certificateAlias="samlcas"/>
+					<cxf:features>
+						<spring:bean class="org.apache.cxf.feature.LoggingFeature" />
+					</cxf:features>
+					<cxf:inInterceptors>
+						<spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+							<spring:property name="properties" ref="wss4jInConfiguration2" />
+						</spring:bean>
+					</cxf:inInterceptors>
+				</cxf:inbound-endpoint>
+			</inbound>
+			<component>
+				<spring-object bean="HelloWorld" />
+				<binding interface="com.atosorigin.esi.saml.HelloWorldService">
+					<jms:outbound-endpoint queue="saml.backend.queue" synchronous="true" remoteSync="true" remoteSyncTimeout="20000">
+						<saml:jms-security-filter certificateAlias="samlcas"/>
+					</jms:outbound-endpoint>
+				</binding>
+			</component>
+		</service>
+	</model>
+</mule>
