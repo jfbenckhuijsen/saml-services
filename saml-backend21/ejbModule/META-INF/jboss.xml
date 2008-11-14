@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss>
+	<security-domain>java:/jaas/saml</security-domain>
+
+	<enterprise-beans>
+		<session>
+			<ejb-name>HelloWorld</ejb-name>
+		</session>
+	</enterprise-beans>
+</jboss> 

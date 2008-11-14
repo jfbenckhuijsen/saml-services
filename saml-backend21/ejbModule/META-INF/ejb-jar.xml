@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ejb-jar id="ejb-jar_ID" version="2.1"
+	xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/ejb-jar_2_1.xsd">
+	<display-name>saml-backend21</display-name>
+	<enterprise-beans>
+		<session>
+			<display-name>HelloWorldEJB</display-name>
+			<ejb-name>HelloWorld</ejb-name>
+			<home>com.atosorigin.saml.backend.HelloWorldRemoteHome</home>
+			<remote>com.atosorigin.saml.backend.HelloWorldRemote</remote>
+			<ejb-class>com.atosorigin.saml.backend.HelloWorldBean</ejb-class>
+			<session-type>Stateless</session-type>
+			<transaction-type>Container</transaction-type>
+			<security-role-ref>
+				<role-name>USER</role-name>
+			</security-role-ref>
+		</session>
+	</enterprise-beans>
+	<assembly-descriptor>
+		<method-permission>
+			<role-name>USER</role-name>
+			<method>
+				<ejb-name>HelloWorld</ejb-name>
+				<method-intf>Remote</method-intf>
+				<method-name>sayHello</method-name>
+			</method>
+			<method>
+				<ejb-name>HelloWorld</ejb-name>
+				<method-intf>Home</method-intf>
+				<method-name>create</method-name>
+			</method>
+		</method-permission>
+	</assembly-descriptor>
+	<ejb-client-jar>saml-backend21-client.jar</ejb-client-jar>
+</ejb-jar>
