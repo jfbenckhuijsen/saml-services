@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop-2.0.xsd"
+	default-init-method="init" default-autowire="byName">
+
+	<import resource="classpath*:/META-INF/spring-orchestra-init.xml" />
+	<bean
+		class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+		<property name="scopes">
+			<map>
+				<entry key="conversation.manual">
+					<bean
+						class="org.apache.myfaces.orchestra.conversation.spring.SpringConversationScope">
+						<property name="timeout" value="30" />
+					</bean>
+				</entry>
+
+				<entry key="conversation.access">
+					<bean
+						class="org.apache.myfaces.orchestra.conversation.spring.SpringConversationScope">
+						<property name="timeout" value="30" />
+						<property name="lifetime" value="access" />
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<!-- include service beans -->
+	<import resource="config/serviceBeans.xml" />
+	
+	<!-- include applications beans -->
+	<import resource="config/applicationBeans.xml" />
+
+	<!-- include business beans -->
+	<import resource="config/businessBeans.xml" />
+	
+	<!-- include page beans -->
+	<import resource="config/pageBeans.xml" />
+	
+	<!-- include security beans -->
+	<import resource="classpath*:/META-INF/security/spring-cas-security-init.xml" />
+	<import resource="config/securityConfig.xml" />
+
+</beans>

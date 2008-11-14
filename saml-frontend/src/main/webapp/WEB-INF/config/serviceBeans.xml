@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="samlService" class="com.atosorigin.esi.saml.Saml"
+		factory-bean="samlServiceFactory" factory-method="create" />
+
+	<bean id="samlServiceFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+		<property name="serviceClass" value="com.atosorigin.esi.saml.Saml" />
+		<property name="address" value="http://localhost:8003/esi/saml-test" />
+		<property name="outInterceptors">
+			<list>
+				<bean class="com.atosorigin.saml.wss.AcegiUsernameInterceptor" />
+
+				<bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+					<constructor-arg>
+						<map>
+							<entry key="action" value="SAMLTokenUnsigned Timestamp" />
+							<entry key="samlPropFile" value="saml.properties" />
+							<!--
+								<entry key="signaturePropFile" value="saml.properties" />
+							-->
+							<entry key="signatureKeyIdentifier" value="DirectReference" />
+						</map>
+					</constructor-arg>
+				</bean>
+			</list>
+		</property>
+	</bean>
+</beans>
