@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+	   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+	   http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd ">
+
+	<spring:beans>
+	
+		<jee:jndi-lookup id="jmsConnectionFactory"
+			jndi-name="ConnectionFactory">
+				<jee:environment >
+					java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory
+					java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces
+					java.naming.provider.url=jnp://127.0.0.1:1099
+				</jee:environment>
+		</jee:jndi-lookup>
+	</spring:beans>
+	
+	<jms:connector name="jmsConnector" connectionFactory-ref="jmsConnectionFactory" specification="1.1" />
+	
+	<jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage" />
+	<jms:jmsmessage-to-object-transformer name="JMSMessageToObject" />
+	
+</mule>
