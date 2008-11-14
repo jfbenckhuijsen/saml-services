@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.atosorigin.saml</groupId>
+	<artifactId>saml-parent</artifactId>
+	<packaging>pom</packaging>
+	<version>1.0-SNAPSHOT</version>
+	<name>SAML CAS Parent</name>
+	
+	<properties>
+		<esi.version>1.2.0-SNAPSHOT</esi.version>
+		<cxf.version>2.1.1</cxf.version>
+		<junit.version>4.4</junit.version>
+		<spring.version>2.5.5</spring.version>
+		<spring.security.version>2.0.3</spring.security.version>
+
+		<!-- Common frameworks -->
+		<jaxb.version>2.1</jaxb.version>
+		<log4j.version>1.2.14</log4j.version>
+		<junit.version>4.4</junit.version>
+		<xstream.version>1.2.2</xstream.version>
+		<cglib.version>2.1_3</cglib.version>
+		<aspectj.version>1.5.4</aspectj.version>
+		<beanutils.version>1.7.0</beanutils.version>
+		<collections.version>3.2.1</collections.version>
+		<pool.version>1.4</pool.version>
+		<io.version>1.3.1</io.version>
+		
+		<!-- Mule based components -->
+		<mule.version>2.0.2</mule.version>
+		<slf4j.version>1.5.0</slf4j.version>
+		<jbpm.version>3.2.2</jbpm.version>
+		<activemq.version>4.1.2</activemq.version>
+		<geronimo-jms.version>1.1.1</geronimo-jms.version>
+		<geronimo-jta.version>1.1</geronimo-jta.version>
+		<geronimo-connector.version>2.0.0</geronimo-connector.version>
+		<wss4j.version>1.5.4</wss4j.version>
+		<asm.version>2.2.3</asm.version>
+		<concurrent.version>3.1</concurrent.version>
+		<jug.version>2.0.0</jug.version>
+		
+		<alfresco.version>2.9.0B</alfresco.version>
+		<cas.version>3.3</cas.version>
+
+		<!-- Database dependencies -->
+		<hibernate.version>3.2.1.ga</hibernate.version>
+		<jpa.version>1.0</jpa.version>
+		<c3p0.version>0.9.1</c3p0.version>
+		<hsqldb.version>1.8.0.7</hsqldb.version>
+		<postgresql.version>8.3-603.jdbc4</postgresql.version>
+
+		<!-- Frontend dependencies -->
+		<myfaces.version>1.2.2</myfaces.version>
+		<tomahawk.version>1.1.6</tomahawk.version>
+		<facelets.version>1.1.14</facelets.version>
+		<richfaces.version>3.2.1.GA</richfaces.version>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>jboss</id>
+			<url>http://repository.jboss.com/maven2</url>
+		</repository>
+        <repository>
+            <id>jasig-repository</id>
+            <name>JA-SIG Maven2 Repository</name>
+            <url>http://developer.ja-sig.org/maven2</url>
+        </repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>RELEASE</version>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
