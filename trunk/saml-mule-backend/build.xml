@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<project name="SAML ActiveMQ" default="start-activemq" basedir=".">
+
+	<!-- Change this property to your local activeMQ installation directory -->
+	<property name="activemq.home" location="../apache-activemq-4.1.2/" />
+
+	<!-- Initializes the environment paths and properties -->
+	<target name="global-init" unless="initialized">
+		<property name="initialized" value="true" />
+	</target>
+
+	<target name="start-activemq" description="Start ActiveMQ" depends="global-init">
+		<condition property="activemq.bin" value="activemq">
+			<os family="unix" />
+		</condition>
+
+		<condition property="activemq.bin" value="activemq.bat">
+			<os family="windows" />
+		</condition>
+
+		<exec executable="${activemq.home}/bin/${activemq.bin}" />
+	</target>
+
+</project>

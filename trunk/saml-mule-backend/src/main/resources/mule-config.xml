@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0" 
+	xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+	xmlns:ejb="http://www.mulesource.org/schema/mule/ejb/2.0"
+	xmlns:saml="http://www.mulesource.org/schema/mule/saml/2.0"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+	   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/ejb/2.0 http://www.mulesource.org/schema/mule/ejb/2.0/mule-ejb.xsd
+       http://www.mulesource.org/schema/mule/saml/2.0 http://www.mulesource.org/schema/mule/saml/2.0/mule-saml.xsd">
+	<spring:beans>
+		<!-- Import JMS Settings  -->
+		<spring:import resource="classpath:mule-jms-config.xml" />
+
+		<!-- Import global system properties  -->
+		<spring:bean
+			class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+
+		<spring:bean id="HelloWorld" class="com.atosorigin.esi.saml.HelloWorldImpl" />
+
+	</spring:beans>
+
+	<ejb:connector name="jbossConnector" 
+		jndiInitialFactory="org.jnp.interfaces.NamingContextFactory"
+		jndiUrlPkgPrefixes="org.jboss.naming:org.jnp.interfaces" 
+		jndiProviderUrl="jnp://127.0.0.1:1099"
+		securityPolicy="src/main/resources/security.policy"/>
+	 
+	<saml:security-manager>
+		<saml:saml-security-provider name="samlSecurityProvider">
+			<saml:key-properties key-store-file="saml.ks" 
+				key-store-type="JKS" 
+				key-store-password="password" 
+				sign-key-alias="mulebackend" 
+				sign-key-password="password"/>
+		</saml:saml-security-provider>
+	</saml:security-manager>
+
+	<model name="Main">
+		<!--
+			************************************************************************
+			Service definitions
+			*************************************************************************
+		-->
+		<service name="BackendJmsService">
+			<inbound>
+				<jms:inbound-endpoint queue="saml.backend.queue">
+					<saml:jms-security-filter certificateAlias="mulefrontend"/>
+				</jms:inbound-endpoint>
+			</inbound>
+			<component>
+				<spring-object bean="HelloWorld" />
+				<binding interface="com.atosorigin.saml.backend.HelloWorldRemote" method="sayHello">
+					<ejb:outbound-endpoint synchronous="true" 
+						connector-ref="jbossConnector"
+						host="localhost" 
+						port="1099" 
+						object="HelloWorld"
+						method="sayHello">
+						<saml:ejb-security-filter loginConfigUrl="classpath:auth.conf"/>
+					</ejb:outbound-endpoint>
+				</binding>
+			</component>
+		</service>
+	</model>
+</mule>
