@@ -1,0 +1,85 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jee="http://www.springframework.org/schema/jee"
+	xsi:schemaLocation="
+  			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+            http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd
+            http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.0.xsd">
+	
+	<!-- Import shared LDAP settings -->		
+	<import resource="classpath:cas-ldap.xml"/>
+	
+	<security:http
+		entry-point-ref="casProcessingFilterEntryPoint">
+		<security:intercept-url pattern="/expired.jspx"
+			filters="none" />
+		<security:intercept-url pattern="/error.jspx"
+			filters="none" />
+		<security:intercept-url pattern="/login.jspx"
+			filters="none" />
+		<security:intercept-url pattern="/index.jsp"
+			filters="none" />
+		<security:intercept-url pattern="/css/**"
+			filters="none" />
+		<security:intercept-url pattern="/images/**"
+			filters="none" />
+		<security:intercept-url pattern="/js/**"
+			filters="none" />
+		<security:intercept-url pattern="/a4j_resource/**"
+			filters="none" />
+		<security:intercept-url pattern="/**" access="ROLE_USER" />
+		<security:logout logout-success-url="/" />
+	</security:http>
+	
+	<bean id="serviceProperties" class="org.springframework.security.ui.cas.ServiceProperties">
+		<property name="service"
+			value="https://localhost:8443/saml-frontend/j_spring_cas_security_check" />
+		<property name="sendRenew" value="false" />
+	</bean>
+	
+	<security:authentication-manager alias="authenticationManager" />
+	
+	<bean id="casProcessingFilter" class="org.springframework.security.ui.cas.CasProcessingFilter">
+		<security:custom-filter after="CAS_PROCESSING_FILTER" />
+		<property name="authenticationManager" ref="authenticationManager" />
+		<property name="authenticationFailureUrl" value="/error.jspx" />
+		<property name="defaultTargetUrl" value="/" />
+		<property name="proxyGrantingTicketStorage" ref="proxyGrantingTicketStorage" />
+		<property name="proxyReceptorUrl" value="/casProxy/receptor" />
+	</bean>
+	
+	<bean id="casProcessingFilterEntryPoint"
+		class="org.springframework.security.ui.cas.CasProcessingFilterEntryPoint">
+		<property name="loginUrl">
+			<jee:jndi-lookup jndi-name="cn=casLoginServiceLocation"/>
+		</property>
+		<property name="serviceProperties" ref="serviceProperties" />
+	</bean>
+	
+	<bean id="casAuthenticationProvider"
+		class="org.springframework.security.providers.cas.CasAuthenticationProvider">
+		<security:custom-authentication-provider />
+		<property name="userDetailsService" ref="userDetailsService" />
+		<property name="serviceProperties" ref="serviceProperties" />
+		<property name="ticketValidator">
+			<bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+				 <constructor-arg index="0">
+				 	<jee:jndi-lookup jndi-name="cn=casServiceLocation"/>
+				 </constructor-arg>
+				 <property name="proxyGrantingTicketStorage" ref="proxyGrantingTicketStorage" />
+				 <property name="proxyCallbackUrl" value="https://localhost:8443/saml-frontend/casProxy/receptor" />
+			</bean>
+		</property>
+		<property name="key" value="an_id_for_this_auth_provider_only" />
+	</bean>
+	
+	<bean id="proxyGrantingTicketStorage" class="org.jasig.cas.client.proxy.ProxyGrantingTicketStorageImpl" />
+	
+	<!--  Deploy Environment  -->
+	<bean id="NOT_USED_serviceProperties" class="org.springframework.security.ui.cas.ServiceProperties">
+		<property name="service">
+			<jee:jndi-lookup jndi-name="cn=kccSecurityServiceLocation" />
+		</property>
+		<property name="sendRenew" value="false" />
+	</bean>
+</beans>

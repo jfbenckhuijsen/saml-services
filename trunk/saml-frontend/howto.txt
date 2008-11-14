@@ -1,0 +1,5 @@
+Configure CAS to use LDAP
+Configure Frontend to use CAS & LDAP (+Proxy Granting Ticket receptor) 
+Configure Tomcat for SSL
+	- Keystore firstname/lastname = FQDN
+	- Keystore = JSSE Truststore
