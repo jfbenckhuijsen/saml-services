@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/saml/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/saml/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
+                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+
+    <xsd:element name="security-manager" type="securityManagerType" substitutionGroup="mule:abstract-security-manager"/>
+    <xsd:complexType name="securityManagerType">
+        <xsd:annotation>
+            <xsd:documentation>
+                This is the security provider type that is used to configure Acegi related functionality.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractSecurityManagerType">
+                <xsd:sequence>
+            	<xsd:element ref="saml-security-provider"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="saml-security-provider" type="samlSecurityProviderType">
+        <xsd:annotation>
+            <xsd:documentation>
+                An Acegi-based security provider that delegates authorization to some
+                other provider.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="samlSecurityProviderType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:securityProviderType">
+                <xsd:sequence>
+                	<xsd:element name="key-properties" type="keyPropertiesType"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+	 
+	<xsd:complexType name="keyPropertiesType">
+		<xsd:attribute name="key-store-file" type="xsd:string" use="required"/>
+		<xsd:attribute name="key-store-type" type="xsd:string" use="required"/>
+	    <xsd:attribute name="key-store-password" type="xsd:string" use="required"/>
+	    <xsd:attribute name="sign-key-alias" type="xsd:string" use="required"/>
+	    <xsd:attribute name="sign-key-password" type="xsd:string" use="required"/>
+	</xsd:complexType>
+	
+	<xsd:complexType name="abstractSamlSecurityFilterType">
+    	<xsd:complexContent>
+            <xsd:extension base="mule:abstractSecurityFilterType">
+	    		<xsd:attribute name="certificateAlias" type="xsd:string" use="optional"/>
+	    	</xsd:extension>
+	    </xsd:complexContent>
+    </xsd:complexType>
+	
+    <xsd:element name="cxf-security-filter" type="cxfSecurityFilterType" substitutionGroup="mule:abstract-security-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+                This appears to authenticate users via information in WS-Security headers.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="cxfSecurityFilterType">
+    	<xsd:complexContent>
+            <xsd:extension base="abstractSamlSecurityFilterType">
+	    		
+	    	</xsd:extension>
+	    </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="cxf-security-interceptor" type="cxfSecurityInterceptorType">
+        <xsd:annotation>
+            <xsd:documentation>
+                This appears to authenticate users via information in standard HTTP headers.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="cxfSecurityInterceptorType">
+	    <xsd:attribute name="certificateAlias" type="xsd:string" use="required"/>
+    </xsd:complexType>
+    
+    <xsd:element name="jms-security-filter" type="jmsSecurityFilterType" substitutionGroup="mule:abstract-security-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+                This appears to authenticate users via information in standard JMS headers.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    
+    <xsd:complexType name="jmsSecurityFilterType">
+    	<xsd:complexContent>
+            <xsd:extension base="abstractSamlSecurityFilterType">
+
+	    	</xsd:extension>
+	    </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="ejb-security-filter" type="ejbSecurityFilterType" substitutionGroup="mule:abstract-security-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+                This appears to authenticate users via JAAS over RMI
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    
+    <xsd:complexType name="ejbSecurityFilterType">
+    	<xsd:complexContent>
+            <xsd:extension base="abstractSamlSecurityFilterType">
+				<xsd:attribute name="loginConfigUrl" type="xsd:string" use="optional"/>
+	    	</xsd:extension>
+	    </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>
